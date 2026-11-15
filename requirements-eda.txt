@@ -1,0 +1,4 @@
+# Versions used to generate the initial full-archive exploratory figures.
+numpy==2.5.4
+Pillow==13.0.0
+matplotlib==3.11.2

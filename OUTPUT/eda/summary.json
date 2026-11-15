@@ -1,0 +1,21 @@
+{
+  "archive": "C:\\Users\\annie\\Downloads\\Names100Dataset.tar.gz",
+  "image_count": 80000,
+  "name_count": 100,
+  "min_images_per_name": 800,
+  "max_images_per_name": 800,
+  "decoded_images": 80000,
+  "brightness_mean": 116.35194837673471,
+  "brightness_median": 116.44861641666665,
+  "brightness_sd": 32.43247346864034,
+  "brightness_percentiles": {
+    "min": 2.002077055555555,
+    "p05": 62.48905804166667,
+    "p25": 95.07045858333333,
+    "p75": 137.8209450138889,
+    "p95": 169.75395580833336,
+    "max": 245.82364355555555
+  },
+  "brightness_definition": "Mean of 0.299R + 0.587G + 0.114B over all pixels; encoded RGB, 0-255.",
+  "decode_failures": []
+}
