@@ -1,0 +1,50 @@
+{
+  "pilot_only": true,
+  "archive": "C:\\Users\\annie\\Downloads\\Names100Dataset.tar.gz",
+  "seed": 4002,
+  "sample_per_name": 10,
+  "sampled": 1000,
+  "retained": 869,
+  "outcomes": {
+    "estimated_age_at_least_18": 869,
+    "estimated_age_under_18": 59,
+    "user_review_excluded": 67,
+    "multiple_faces": 2,
+    "no_face": 3
+  },
+  "estimated_age_cutoff": 18,
+  "detection_threshold": 0.5,
+  "detection_size": [
+    160,
+    160
+  ],
+  "detector": "SCRFD in buffalo_l; differs from MI2 RetinaFace",
+  "provider": "CPUExecutionProvider",
+  "model_root": "C:\\Users\\annie\\OneDrive\\Desktop\\DS4002_Project3\\models",
+  "normalization": "RGB float32 /127.5 -1; CHW (3,112,112); do not normalize again",
+  "class_minimum_applied": false,
+  "splits_created": false,
+  "package_versions": {
+    "insightface": "0.7.3",
+    "onnxruntime": "1.32.0",
+    "numpy": "1.26.4",
+    "opencv-python-headless": "4.11.0.86"
+  },
+  "elapsed_seconds": 53.5,
+  "user_review": {
+    "explicit_exclusions": 67,
+    "previously_retained_now_excluded": 40,
+    "exceptions_left_at_automated_status": [
+      "V145",
+      "V155",
+      "V162",
+      "V168",
+      "V169",
+      "V170",
+      "V171"
+    ],
+    "original_outputs_backup": "before_user_review",
+    "quarantine": "excluded_by_user",
+    "remaining_images_not_all_visually_verified": true
+  }
+}
