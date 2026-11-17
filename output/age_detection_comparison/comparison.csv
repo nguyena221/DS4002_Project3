@@ -1,0 +1,10 @@
+age_cutoff,detection_threshold,images_before_class_minimum,additional_removed_vs_same_age_det_05,names_meeting_300_minimum,images_after_class_minimum,names_below_minimum
+18,0.5,73979,0,100,73979,
+18,0.7,73948,31,100,73948,
+18,0.9,73893,86,100,73893,
+25,0.5,64539,0,100,64539,
+25,0.7,64511,28,100,64511,
+25,0.9,64462,77,100,64462,
+30,0.5,47115,0,98,46567,Noah;Sofia
+30,0.7,47097,18,98,46549,Noah;Sofia
+30,0.9,47057,58,98,46511,Noah;Sofia

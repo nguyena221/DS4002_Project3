@@ -1,0 +1,94 @@
+{
+  "complete": true,
+  "results": [
+    {
+      "age_cutoff": 18,
+      "detection_threshold": 0.5,
+      "images_before_class_minimum": 73979,
+      "additional_removed_vs_same_age_det_05": 0,
+      "names_meeting_300_minimum": 100,
+      "images_after_class_minimum": 73979,
+      "names_below_minimum": ""
+    },
+    {
+      "age_cutoff": 18,
+      "detection_threshold": 0.7,
+      "images_before_class_minimum": 73948,
+      "additional_removed_vs_same_age_det_05": 31,
+      "names_meeting_300_minimum": 100,
+      "images_after_class_minimum": 73948,
+      "names_below_minimum": ""
+    },
+    {
+      "age_cutoff": 18,
+      "detection_threshold": 0.9,
+      "images_before_class_minimum": 73893,
+      "additional_removed_vs_same_age_det_05": 86,
+      "names_meeting_300_minimum": 100,
+      "images_after_class_minimum": 73893,
+      "names_below_minimum": ""
+    },
+    {
+      "age_cutoff": 25,
+      "detection_threshold": 0.5,
+      "images_before_class_minimum": 64539,
+      "additional_removed_vs_same_age_det_05": 0,
+      "names_meeting_300_minimum": 100,
+      "images_after_class_minimum": 64539,
+      "names_below_minimum": ""
+    },
+    {
+      "age_cutoff": 25,
+      "detection_threshold": 0.7,
+      "images_before_class_minimum": 64511,
+      "additional_removed_vs_same_age_det_05": 28,
+      "names_meeting_300_minimum": 100,
+      "images_after_class_minimum": 64511,
+      "names_below_minimum": ""
+    },
+    {
+      "age_cutoff": 25,
+      "detection_threshold": 0.9,
+      "images_before_class_minimum": 64462,
+      "additional_removed_vs_same_age_det_05": 77,
+      "names_meeting_300_minimum": 100,
+      "images_after_class_minimum": 64462,
+      "names_below_minimum": ""
+    },
+    {
+      "age_cutoff": 30,
+      "detection_threshold": 0.5,
+      "images_before_class_minimum": 47115,
+      "additional_removed_vs_same_age_det_05": 0,
+      "names_meeting_300_minimum": 98,
+      "images_after_class_minimum": 46567,
+      "names_below_minimum": "Noah;Sofia"
+    },
+    {
+      "age_cutoff": 30,
+      "detection_threshold": 0.7,
+      "images_before_class_minimum": 47097,
+      "additional_removed_vs_same_age_det_05": 18,
+      "names_meeting_300_minimum": 98,
+      "images_after_class_minimum": 46549,
+      "names_below_minimum": "Noah;Sofia"
+    },
+    {
+      "age_cutoff": 30,
+      "detection_threshold": 0.9,
+      "images_before_class_minimum": 47057,
+      "additional_removed_vs_same_age_det_05": 58,
+      "names_meeting_300_minimum": 98,
+      "images_after_class_minimum": 46511,
+      "names_below_minimum": "Noah;Sofia"
+    }
+  ],
+  "source_hashes": {
+    "output\\prepared_dataset\\split_manifest.csv": "7c8a6039b0739673e5a39128426d7d15f6fc2a863cbad82835cfaebf2dfb4d13",
+    "output\\age_filter\\age_filter_manifest.csv": "b41070c9cca609fc6c13f12e6a7e89be61a704000862463c2ef2b90742a8df05"
+  },
+  "model_rerun": false,
+  "active_dataset_modified": false,
+  "splits_modified": false,
+  "warning": "Post-filter comparison on existing single-face prepared images. Does not reconsider previously excluded multiple-face images. Exact retention counts are not child/cartoon classification or detection accuracy."
+}

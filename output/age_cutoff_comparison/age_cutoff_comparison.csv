@@ -1,0 +1,4 @@
+estimated_age_cutoff,prepared_input_images,retained_before_class_minimum,removed_from_current_dataset,retained_percent_of_current_dataset,names_meeting_300_minimum,names_below_300_minimum,images_after_class_minimum,smallest_class_before_minimum,largest_class_before_minimum,training_audit_available,training_audit_retained,training_audit_questionable_retained,training_audit_questionable_percent,training_audit_child_appearing_retained,training_audit_artificial_or_stylized_retained,training_audit_age_uncertain_retained,training_audit_unassessable_retained,training_audit_adult_appearing_retained,training_audit_adult_appearing_available,training_audit_adult_appearing_removed
+18,73979,73979,0,100.0,100,0,73979,576,781,125,125,58,46.4,28,5,22,3,67,67,0
+25,73979,64539,9440,87.24,100,0,64539,432,745,125,101,40,39.6,19,3,16,2,61,67,6
+30,73979,47115,26864,63.69,98,2,46567,274,658,125,75,26,34.67,11,3,10,2,49,67,18

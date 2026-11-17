@@ -1,0 +1,10 @@
+{
+  "verified": true,
+  "input_records": 79442,
+  "retained": 73979,
+  "excluded_under_18": 5463,
+  "unique_inputs": true,
+  "all_hashes_match_step1": true,
+  "prior_67_exclusions_not_reintroduced": true,
+  "all_decisions_match_fixed_cutoff_18": true
+}

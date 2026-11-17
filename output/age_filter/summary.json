@@ -1,0 +1,39 @@
+{
+  "stage": "2: estimated age >=18 only",
+  "complete": true,
+  "input_images": 79442,
+  "retained": 73979,
+  "excluded_under_18": 5463,
+  "age_cutoff": 18,
+  "outcomes": {
+    "estimated_age_at_least_18": 73979,
+    "estimated_age_under_18": 5463
+  },
+  "model": "InsightFace buffalo_l genderage.onnx",
+  "api": "InsightFace Attribute.get; same module underlying FaceAnalysis",
+  "face_boxes": "Existing RetinaFace step-1 bounding boxes; no face redetection",
+  "model_sha256": "4fde69b1c810857b88c64a335084f1c3fe8f01246c9a191b48c7bb756d6652fb",
+  "model_input_size": [
+    96,
+    96
+  ],
+  "gender_output_saved": false,
+  "provider": "CPUExecutionProvider",
+  "versions": {
+    "insightface": "0.7.3",
+    "onnxruntime": "1.32.0",
+    "numpy": "1.26.4",
+    "opencv-python-headless": "4.11.0.86"
+  },
+  "original_dataset_modified": false,
+  "step1_outputs_modified": false,
+  "prior_user_exclusions_reintroduced": false,
+  "age_cutoff_comparisons": false,
+  "detection_threshold_comparisons": false,
+  "class_minimum_applied": false,
+  "saved_training_crops_or_tensors": false,
+  "normalization_for_training_applied": false,
+  "splits_created": false,
+  "elapsed_seconds": 246.3,
+  "warning": "Estimated age is not verified age; false inclusion/exclusion remains possible. Retained means model-estimated age >=18, not confirmed adulthood."
+}

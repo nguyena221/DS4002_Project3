@@ -1,0 +1,19 @@
+{
+  "complete": true,
+  "images": 64398,
+  "names": 100,
+  "minimum_class_count": 431,
+  "redundant_copies_removed": 139,
+  "remaining_source_duplicate_groups": 0,
+  "remaining_aligned_pixel_duplicate_groups": 0,
+  "retained_labels_and_splits_unchanged": true,
+  "all_saved_tensors_hash_verified": true,
+  "transitive_deduplication_test_passed": true,
+  "baseline_duplicate_split_test_passed": true,
+  "split_counts": {
+    "train": 45016,
+    "test": 9717,
+    "validation": 9665
+  },
+  "warning": "Exact equality only; near duplicates and different photographs of the same person are not comprehensively detected."
+}

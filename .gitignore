@@ -17,10 +17,26 @@ Thumbs.db
 *.ckpt
 *.npy
 *.npz
-DATA/raw/*
-!DATA/raw/.gitkeep
-DATA/processed/*
-!DATA/processed/.gitkeep
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
 models/
 .insightface/
-OUTPUT/eda/image_brightness.csv
+output/eda/image_brightness.csv
+
+# Prepared local image tensors
+*.h5
+*.h5.partial
+
+# Local archived experiments; retain the visual judgments used by comparisons.
+data/archive/*
+!data/archive/earlier_experiments/
+data/archive/earlier_experiments/*
+!data/archive/earlier_experiments/screening_20000/
+data/archive/earlier_experiments/screening_20000/*
+!data/archive/earlier_experiments/screening_20000/visual_review/
+data/archive/earlier_experiments/screening_20000/visual_review/*
+!data/archive/earlier_experiments/screening_20000/visual_review/visual_review.csv
+# Publish the small active-dataset pointer, not local image tensors.
+!data/processed/active_dataset.json

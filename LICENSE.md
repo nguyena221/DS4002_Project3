@@ -24,5 +24,5 @@ SOFTWARE.
 
 This license applies to original project code and documentation. It does not
 relicense third-party datasets, photographs, software, or pretrained weights.
-Names100 usage terms are described in DATA/README.md. InsightFace pretrained
+Names100 usage terms are described in data/README.md. InsightFace pretrained
 models have their own terms; consult the official source before use.
