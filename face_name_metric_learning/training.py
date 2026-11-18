@@ -318,6 +318,78 @@ def trial_checkpoint_path(repository_root, trial):
     )
 
 
+SELECTED_EMBEDDING_FILENAMES = {
+    "triplet_margin": "triplet_margin_selected.npz",
+    "arcface": "arcface_selected.npz",
+    "supcon": "supcon_selected.npz",
+}
+
+
+def read_selected_trials(trial_results_path):
+    """Read the complete ledger and return exactly the selected 3/4/3-grid rows."""
+    from .handoff import validate_trial_ledger
+
+    ledger = validate_trial_ledger(trial_results_path)
+    selected_ids = ledger["selected_trials"]
+    rows_by_id = {row["trial_id"]: row for row in ledger["rows"]}
+    return {
+        loss: rows_by_id[selected_ids[loss]]
+        for loss in LOSSES
+    }
+
+
+def export_selected_embeddings(
+    *,
+    repository_root,
+    manifest_path,
+    hdf5_path,
+    trial_results_path,
+    package_dir,
+    model_loader=None,
+    embedding_exporter=None,
+    batch_size=128,
+    device="cpu",
+    expected_dimension=EMBEDDING_DIMENSION,
+):
+    """Export only the three selected local checkpoints as stable NPZ files."""
+    selected = read_selected_trials(trial_results_path)
+    checkpoint_paths = {
+        loss: trial_checkpoint_path(repository_root, trial)
+        for loss, trial in selected.items()
+    }
+    for path in checkpoint_paths.values():
+        if not path.is_file():
+            raise FileNotFoundError(f"selected checkpoint missing: {path}")
+
+    if model_loader is None:
+        from .iresnet import load_iresnet100
+
+        model_loader = load_iresnet100
+    if embedding_exporter is None:
+        embedding_exporter = export_baseline_embeddings
+
+    package_dir = Path(package_dir)
+    outputs = {}
+    for loss in LOSSES:
+        model = model_loader(checkpoint_paths[loss], device)
+        output_path = (
+            package_dir
+            / "embeddings"
+            / SELECTED_EMBEDDING_FILENAMES[loss]
+        )
+        embedding_exporter(
+            model,
+            hdf5_path=hdf5_path,
+            manifest_path=manifest_path,
+            output_path=output_path,
+            batch_size=batch_size,
+            device=device,
+            expected_dimension=expected_dimension,
+        )
+        outputs[output_path.name] = output_path
+    return outputs
+
+
 def write_trial_ledger(path, rows):
     """Write a deterministic complete ledger after validating all 10 candidates."""
     rows = [dict(row) for row in rows]

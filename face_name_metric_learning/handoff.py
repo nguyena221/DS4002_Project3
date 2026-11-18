@@ -565,6 +565,67 @@ def build_handoff_manifest(
     )
 
 
+def build_handoff_manifest_from_environment(
+    package_dir,
+    *,
+    environment_record_path,
+    manifest_path,
+    hdf5_path,
+    trial_results_path,
+    child_seed_policy,
+    split_counts=EXPECTED_SPLIT_COUNTS,
+    class_count=EXPECTED_CLASS_COUNT,
+    root_seed=4002,
+    expected_dimension=EMBEDDING_DIMENSION,
+    norm_tolerance=NORM_TOLERANCE,
+    generated_at=None,
+    git_commit=None,
+    audit=None,
+):
+    """Build manifest metadata from the persisted setup and training records."""
+    with Path(environment_record_path).open(encoding="utf-8") as stream:
+        environment = json.load(stream)
+    _require(isinstance(environment, dict), "environment_record", "must be an object")
+    packages = environment.get("packages")
+    _require(isinstance(packages, dict), "environment_record.packages", "must be an object")
+    version_values = {
+        "python": environment.get("python"),
+        "pytorch": packages.get("pytorch"),
+        "cuda": environment.get("cuda"),
+        "pytorch_metric_learning": packages.get("pytorch_metric_learning"),
+        "pytorch_insightface": packages.get("pytorch_insightface"),
+    }
+    versions = {
+        name: str(value) if value is not None else ""
+        for name, value in version_values.items()
+    }
+    weights = environment.get("pretrained_weights")
+    _require(isinstance(weights, dict), "environment_record.pretrained_weights", "must be an object")
+
+    ledger = validate_trial_ledger(trial_results_path)
+    devices = {row["device"] for row in ledger["rows"]}
+    _require(len(devices) == 1, "trial_results.device", f"expected one training device, got {sorted(devices)}")
+
+    return build_handoff_manifest(
+        package_dir,
+        manifest_path=manifest_path,
+        hdf5_path=hdf5_path,
+        trial_results_path=trial_results_path,
+        versions=versions,
+        pretrained_weights=weights,
+        device=devices.pop(),
+        child_seed_policy=child_seed_policy,
+        split_counts=split_counts,
+        class_count=class_count,
+        root_seed=root_seed,
+        expected_dimension=expected_dimension,
+        norm_tolerance=norm_tolerance,
+        generated_at=generated_at,
+        git_commit=git_commit,
+        audit=audit,
+    )
+
+
 def validate_handoff_manifest(
     metadata,
     package_dir,

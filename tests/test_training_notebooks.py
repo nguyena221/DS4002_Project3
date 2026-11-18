@@ -21,6 +21,7 @@ class NotebookSchemaTests(unittest.TestCase):
         for name in (
             "00_setup_and_smoke_test.ipynb",
             "01_export_baseline_embeddings.ipynb",
+            "03_export_selected_embeddings.ipynb",
         ):
             path = ROOT / "notebooks" / name
             with self.subTest(notebook=name):
