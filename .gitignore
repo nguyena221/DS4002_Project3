@@ -19,7 +19,7 @@ Thumbs.db
 *.npz
 *.h5
 *.h5.partial
-models/
+*.pth
 .insightface/
 !artifacts/face_name_metric_learning/embeddings/baseline_iresnet100.npz
 !artifacts/face_name_metric_learning/embeddings/triplet_margin_selected.npz
