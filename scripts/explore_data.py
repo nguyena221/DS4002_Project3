@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--archive', required=True)
+    parser.add_argument('--archive', default='data/raw/Names100Dataset.tar.gz')
     parser.add_argument('--output', default='output/eda')
     args = parser.parse_args()
     out = Path(args.output)

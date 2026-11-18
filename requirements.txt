@@ -1,4 +1,4 @@
-﻿albucore==0.0.24
+albucore==0.0.24
 albumentations==2.0.8
 annotated-types==0.8.0
 certifi==2026.10.23

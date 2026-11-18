@@ -1,8 +1,0 @@
-{
-  "data_file": "data/processed/prepared_faces_age25/faces.h5",
-  "report": "output/final_age25/HANDOFF.md",
-  "age_cutoff": 25,
-  "detection_threshold": 0.5,
-  "images": 64398,
-  "names": 100
-}

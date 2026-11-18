@@ -1,4 +1,0 @@
-detection_threshold,estimated_age_cutoff,images_retained,additional_images_removed,names_meeting_300_minimum,images_after_class_minimum,training_audit_retained,training_audit_questionable_retained,training_audit_questionable_percent,child_appearing_retained,artificial_or_stylized_retained,adult_appearing_retained,adult_appearing_removed
-0.5,18,73979,0,100,73979,125,58,46.4,28,5,67,0
-0.7,18,73948,31,100,73948,125,58,46.4,28,5,67,0
-0.9,18,73893,86,100,73893,125,58,46.4,28,5,67,0
