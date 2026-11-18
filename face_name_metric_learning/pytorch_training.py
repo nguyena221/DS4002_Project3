@@ -53,61 +53,52 @@ def _load_manifest_arrays(manifest_rows, split):
 def _loss_module(candidate, config):
     from pytorch_metric_learning import losses
 
-    if candidate.loss == "triplet_margin":
-        return None
-    if candidate.loss == "arcface":
-        return losses.ArcFaceLoss(
+    builders = {
+        "triplet_margin": lambda: None,
+        "arcface": lambda: losses.ArcFaceLoss(
             num_classes=config.num_classes,
             embedding_size=config.embedding_dimension,
             margin=candidate.hyperparameters["margin"],
             scale=candidate.hyperparameters["scale"],
-        )
-    if candidate.loss == "supcon":
-        return losses.SupConLoss(
+        ),
+        "supcon": lambda: losses.SupConLoss(
             temperature=candidate.hyperparameters["temperature"]
-        )
-    raise ValueError(f"unknown loss {candidate.loss!r}")
-
-
-def _loss_value(torch, candidate, criterion, embeddings, labels):
-    import torch.nn.functional as functional
-
-    if candidate.loss == "arcface":
-        return criterion(embeddings, labels)
-    if candidate.loss == "supcon":
-        return criterion(embeddings, labels)
-
-    anchors, positives, negatives = triplet_indices(
-        np.arange(len(labels), dtype=np.int64),
-        labels.detach().cpu().numpy(),
-        np.random.default_rng(len(labels)),
-    )
-    normalized = functional.normalize(embeddings, dim=1)
-    positive_similarity = (normalized[anchors] * normalized[positives]).sum(dim=1)
-    negative_similarity = (normalized[anchors] * normalized[negatives]).sum(dim=1)
-    return functional.relu(
-        negative_similarity
-        - positive_similarity
-        + candidate.hyperparameters["margin"]
-    ).mean()
+        ),
+    }
+    try:
+        return builders[candidate.loss]()
+    except KeyError as error:
+        raise ValueError(f"unknown loss {candidate.loss!r}") from error
 
 
 def _training_loss(torch, candidate, criterion, embeddings, labels, loss_rng):
     import torch.nn.functional as functional
 
-    if candidate.loss != "triplet_margin":
+    def criterion_loss():
         return criterion(embeddings, labels)
-    anchors, positives, negatives = triplet_indices(
-        np.arange(len(labels), dtype=np.int64),
-        labels.detach().cpu().numpy(),
-        loss_rng,
-    )
-    normalized = functional.normalize(embeddings, dim=1)
-    positive = (normalized[anchors] * normalized[positives]).sum(dim=1)
-    negative = (normalized[anchors] * normalized[negatives]).sum(dim=1)
-    return functional.relu(
-        negative - positive + candidate.hyperparameters["margin"]
-    ).mean()
+
+    def triplet_loss():
+        anchors, positives, negatives = triplet_indices(
+            np.arange(len(labels), dtype=np.int64),
+            labels.detach().cpu().numpy(),
+            loss_rng,
+        )
+        normalized = functional.normalize(embeddings, dim=1)
+        positive = (normalized[anchors] * normalized[positives]).sum(dim=1)
+        negative = (normalized[anchors] * normalized[negatives]).sum(dim=1)
+        return functional.relu(
+            negative - positive + candidate.hyperparameters["margin"]
+        ).mean()
+
+    calculators = {
+        "triplet_margin": triplet_loss,
+        "arcface": criterion_loss,
+        "supcon": criterion_loss,
+    }
+    try:
+        return calculators[candidate.loss]()
+    except KeyError as error:
+        raise ValueError(f"unknown loss {candidate.loss!r}") from error
 
 
 def _read_training_batch(hdf5, source_positions, augmentation_rng, flip_probability):
@@ -176,8 +167,13 @@ def _probe_plan(
                 images = torch.from_numpy(images).to("cuda")
                 labels = torch.from_numpy(train_labels[batch_positions]).to("cuda")
                 embeddings = model(images)
-                loss = _loss_value(
-                    torch, candidate, criterion, embeddings, labels
+                loss = _training_loss(
+                    torch,
+                    candidate,
+                    criterion,
+                    embeddings,
+                    labels,
+                    np.random.default_rng(len(labels)),
                 )
             loss.backward()
             model.zero_grad(set_to_none=True)
@@ -333,12 +329,13 @@ def train_candidate(
         "augmentation=horizontal_flip_p0.5",
         f"pytorch_metric_learning={metric_learning_version}",
     ]
-    if candidate.loss == "triplet_margin":
-        notes.append("sampling=unrestricted_random_negative")
-    elif candidate.loss == "arcface":
-        notes.append("head=100_class_temporary")
-    else:
-        notes.append("supcon=same_name_batch_positives")
+    notes.append(
+        {
+            "triplet_margin": "sampling=unrestricted_random_negative",
+            "arcface": "head=100_class_temporary",
+            "supcon": "supcon=same_name_batch_positives",
+        }[candidate.loss]
+    )
     return {
         "trial_id": candidate.trial_id,
         "loss": candidate.loss,

@@ -515,7 +515,15 @@ def build_handoff_manifest(
         )
 
     generated_at = generated_at or _utc_now()
-    audit = audit or {"status": "pass", "timestamp": _utc_now()}
+    if audit is None:
+        audit = {"status": "not_run"}
+    else:
+        audit = dict(audit)
+        _require(
+            audit.get("status") != "pass",
+            "audit.status",
+            "cannot be pass before the independent audit",
+        )
     selected = ledger["selected_trials"]
     metadata = {
         "schema_version": 1,
@@ -733,8 +741,19 @@ def validate_handoff_manifest(
 
     audit = metadata.get("audit")
     _require(isinstance(audit, dict), "audit", "must be an object")
-    _require(audit.get("status") in {"pass", "fail"}, "audit.status", "expected pass or fail")
-    _validate_utc_timestamp(audit.get("timestamp"), "audit.timestamp")
+    _require(
+        audit.get("status") in {"not_run", "pass", "fail"},
+        "audit.status",
+        "expected not_run, pass, or fail",
+    )
+    if audit["status"] == "not_run":
+        _require(
+            "timestamp" not in audit,
+            "audit.timestamp",
+            "must be absent until the independent audit runs",
+        )
+    else:
+        _validate_utc_timestamp(audit.get("timestamp"), "audit.timestamp")
     return metadata
 
 

@@ -265,12 +265,12 @@ class SelectedExportContractTests(unittest.TestCase):
             class_count=1,
             generated_at="2026-11-18T18:00:00Z",
             git_commit="abc123",
-            audit={"status": "pass", "timestamp": "2026-11-18T18:01:00Z"},
         )
 
         self.assertEqual(metadata["selected_trials"]["triplet_margin"], "trial-0")
         self.assertEqual(metadata["versions"]["pytorch"], "2.0")
         self.assertEqual(metadata["device"], "cuda:0")
+        self.assertEqual(metadata["audit"], {"status": "not_run"})
         self.assertFalse(
             any(
                 path.suffix == ".pt"

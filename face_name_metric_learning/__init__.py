@@ -30,6 +30,7 @@ from .training import (
     initialize_trial_ledger,
     load_pretrained_iresnet100,
     loss_contract,
+    named_child_seed,
     select_candidates,
     shuffled_name_balanced_batches,
     supcon_positive_mask,
@@ -40,7 +41,7 @@ from .training import (
     write_trial_ledger,
 )
 from .audit import audit_handoff_package
-from .acceptance import evaluate_handoff_package
+from .acceptance import evaluate_handoff_package, handoff_package_readiness
 
 __all__ = [
     "align_embeddings",
@@ -49,6 +50,7 @@ __all__ = [
     "build_handoff_manifest_from_environment",
     "collect_environment_record",
     "evaluate_handoff_package",
+    "handoff_package_readiness",
     "export_baseline_embeddings",
     "export_selected_embeddings",
     "load_embedding_package",
@@ -73,6 +75,7 @@ __all__ = [
     "child_seed",
     "initialize_trial_ledger",
     "loss_contract",
+    "named_child_seed",
     "read_selected_trials",
     "select_candidates",
     "shuffled_name_balanced_batches",

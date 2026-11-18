@@ -96,17 +96,10 @@ class CandidateConfiguration:
 
     @property
     def trial_id(self):
-        if self.loss == "triplet_margin":
-            suffix = f"margin{_id_number(self.hyperparameters['margin'])}"
-        elif self.loss == "arcface":
-            suffix = (
-                f"m{_id_number(self.hyperparameters['margin'])}"
-                f"_s{self.hyperparameters['scale']}"
-            )
-        elif self.loss == "supcon":
-            suffix = f"t{_id_number(self.hyperparameters['temperature'])}"
-        else:
-            raise ValueError(f"unknown loss {self.loss!r}")
+        try:
+            suffix = _LOSS_TRIAL_SUFFIXES[self.loss](self.hyperparameters)
+        except KeyError as error:
+            raise ValueError(f"unknown loss {self.loss!r}") from error
         return f"{self.loss}_{suffix}_seed{self.seed}".replace(
             "triplet_margin_margin", "triplet_margin"
         )
@@ -153,6 +146,20 @@ def _id_number(value):
     return format(value, "g").replace(".", "p")
 
 
+_LOSS_TRIAL_SUFFIXES = {
+    "triplet_margin": lambda hyperparameters: (
+        f"margin{_id_number(hyperparameters['margin'])}"
+    ),
+    "arcface": lambda hyperparameters: (
+        f"m{_id_number(hyperparameters['margin'])}"
+        f"_s{hyperparameters['scale']}"
+    ),
+    "supcon": lambda hyperparameters: (
+        f"t{_id_number(hyperparameters['temperature'])}"
+    ),
+}
+
+
 def candidate_configurations(seed=DEFAULT_TRAINING_CONFIG.root_seed):
     """Return the agreed 3/4/3 grid in deterministic order."""
     return [
@@ -166,18 +173,23 @@ def candidate_configurations(seed=DEFAULT_TRAINING_CONFIG.root_seed):
     ]
 
 
-def child_seed(candidate, concern):
-    """Derive a stable 32-bit seed for one independently named RNG concern."""
+def named_child_seed(root_seed, concern, scope):
+    """Derive a stable 32-bit seed for an independently named RNG stream."""
     payload = json.dumps(
         {
-            "root_seed": int(candidate.seed),
-            "trial_id": candidate.trial_id,
+            "root_seed": int(root_seed),
             "concern": str(concern),
+            "scope": str(scope),
         },
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")
     return int.from_bytes(hashlib.sha256(payload).digest()[:4], "big")
+
+
+def child_seed(candidate, concern):
+    """Derive a named seed scoped to one candidate configuration."""
+    return named_child_seed(candidate.seed, concern, candidate.trial_id)
 
 
 def shuffled_name_balanced_batches(h5_index, labels, plan, rng):
@@ -246,27 +258,44 @@ def supcon_positive_mask(labels):
     )
 
 
-def loss_contract(candidate, config=DEFAULT_TRAINING_CONFIG):
-    """Return the externally recorded fitting behavior for a candidate loss."""
-    if candidate.loss == "triplet_margin":
-        return {
-            "loss": candidate.loss,
-            "negative_sampling": "uniform unrestricted within other-name batch members",
+def _loss_contract_builders(config):
+    return {
+        "triplet_margin": lambda: {
+            "loss": "triplet_margin",
+            "negative_sampling": (
+                "uniform unrestricted within other-name batch members"
+            ),
             "positive_sampling": "uniform other same-name batch member",
-        }
-    if candidate.loss == "arcface":
-        return {
-            "loss": candidate.loss,
+        },
+        "arcface": lambda: {
+            "loss": "arcface",
             "classifier_classes": config.num_classes,
             "temporary_head": True,
-        }
-    if candidate.loss == "supcon":
-        return {
-            "loss": candidate.loss,
+        },
+        "supcon": lambda: {
+            "loss": "supcon",
             "positives": "same-name batch members excluding the anchor",
             "implementation": "pytorch-metric-learning SupConLoss",
-        }
-    raise ValueError(f"unknown loss {candidate.loss!r}")
+        },
+    }
+
+
+def loss_contract(candidate, config=DEFAULT_TRAINING_CONFIG):
+    """Return the externally recorded fitting behavior for a candidate loss."""
+    try:
+        return _loss_contract_builders(config)[candidate.loss]()
+    except KeyError as error:
+        raise ValueError(f"unknown loss {candidate.loss!r}") from error
+
+
+_LOSS_SELECTION_TIES = {
+    "triplet_margin": lambda hyperparameters: (hyperparameters["margin"],),
+    "arcface": lambda hyperparameters: (
+        hyperparameters["margin"],
+        hyperparameters["scale"],
+    ),
+    "supcon": lambda hyperparameters: (hyperparameters["temperature"],),
+}
 
 
 def _selection_key(row):
@@ -275,15 +304,10 @@ def _selection_key(row):
         if isinstance(row.get("hyperparameters"), dict)
         else json.loads(row["hyperparameters_json"])
     )
-    loss = row["loss"]
-    if loss == "triplet_margin":
-        tie = (hyperparameters["margin"],)
-    elif loss == "arcface":
-        tie = (hyperparameters["margin"], hyperparameters["scale"])
-    elif loss == "supcon":
-        tie = (hyperparameters["temperature"],)
-    else:
-        raise ValueError(f"unknown loss {loss!r}")
+    try:
+        tie = _LOSS_SELECTION_TIES[row["loss"]](hyperparameters)
+    except KeyError as error:
+        raise ValueError(f"unknown loss {row['loss']!r}") from error
     return (
         -float(row["best_validation_triplet_accuracy"]),
         *tie,

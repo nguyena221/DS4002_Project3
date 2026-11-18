@@ -133,8 +133,8 @@ class HandoffAuditTests(unittest.TestCase):
             class_count=2,
             expected_dimension=2,
             generated_at="2026-11-18T18:00:00Z",
-            audit={"status": "fail", "timestamp": "2026-11-18T18:00:00Z"},
         )
+        self.assertEqual(metadata["audit"], {"status": "not_run"})
         write_handoff_manifest(self.handoff_path, metadata)
 
     def tearDown(self):

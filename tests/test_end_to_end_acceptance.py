@@ -10,8 +10,11 @@ import numpy as np
 from face_name_metric_learning import (
     build_handoff_manifest,
     evaluate_handoff_package,
+    handoff_package_readiness,
     write_handoff_manifest,
 )
+from face_name_metric_learning.training import named_child_seed
+from face_name_metrics import paired_bootstrap_statistics
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -137,7 +140,6 @@ class EndToEndAcceptanceTests(unittest.TestCase):
             expected_dimension=2,
             generated_at="2026-11-18T18:00:00Z",
             git_commit="acceptance-fixture",
-            audit={"status": "pass", "timestamp": "2026-11-18T18:01:00Z"},
         )
         write_handoff_manifest(
             self.package_dir / "handoff_manifest.json", metadata
@@ -198,6 +200,52 @@ class EndToEndAcceptanceTests(unittest.TestCase):
                 )
         self.assertNotIn("faces.h5", [path.name for path in consumer.rglob("*")])
 
+    def test_acceptance_uses_a_named_bootstrap_seed_for_each_model_and_split(self):
+        result = evaluate_handoff_package(
+            self.package_dir,
+            manifest_path=self.manifest_path,
+            hdf5_path=None,
+            expected_dimension=2,
+            block_size=3,
+            bootstrap_replicates=10,
+            direct_oracle=False,
+        )
+        with self.manifest_path.open(encoding="utf-8") as stream:
+            rows = [
+                row
+                for row in csv.DictReader(stream)
+                if row["split"] == "validation"
+            ]
+        indices = np.array([int(row["h5_index"]) for row in rows], dtype=np.int64)
+        names = np.array([row["first_name"] for row in rows], dtype=object)
+
+        def embeddings(filename):
+            with np.load(
+                self.package_dir / "embeddings" / filename, allow_pickle=False
+            ) as data:
+                stored = data["validation_h5_index"]
+                positions = {int(value): index for index, value in enumerate(stored)}
+                return data["validation_embeddings"][
+                    [positions[int(value)] for value in indices]
+                ]
+
+        expected = paired_bootstrap_statistics(
+            embeddings("baseline_iresnet100.npz"),
+            embeddings("triplet_margin_selected.npz"),
+            indices,
+            names,
+            replicates=10,
+            seed=named_child_seed(
+                4002, "bootstrap", "triplet_margin_selected/validation"
+            ),
+        )
+        np.testing.assert_allclose(
+            result["bootstrap"]["triplet_margin_selected"]["validation"][
+                "similarity_lifts"
+            ],
+            expected["similarity_lifts"],
+        )
+
     def test_documented_handoff_and_notebook_paths_exist_and_match(self):
         readme = (
             ROOT / "artifacts" / "face_name_metric_learning" / "README.md"
@@ -226,6 +274,18 @@ class EndToEndAcceptanceTests(unittest.TestCase):
             notebook_path = ROOT / "notebooks" / notebook_name
             self.assertTrue(notebook_path.is_file())
             self.assertIn(f"notebooks/{notebook_name}", design)
+
+    def test_repository_production_package_reports_pending_inputs(self):
+        report = handoff_package_readiness(
+            ROOT / "artifacts" / "face_name_metric_learning"
+        )
+
+        self.assertEqual(report["status"], "pending")
+        self.assertIn(
+            "embeddings/baseline_iresnet100.npz", report["missing"]
+        )
+        self.assertIn("trial_results.csv", report["missing"])
+        self.assertIn("handoff_manifest.json", report["missing"])
 
 
 if __name__ == "__main__":

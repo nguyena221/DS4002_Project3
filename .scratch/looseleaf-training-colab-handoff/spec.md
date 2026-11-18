@@ -1,6 +1,12 @@
 # LooseLeaf Training and Colab Evaluation Handoff
 
-Status: ready-for-agent
+Status: implementation-complete-production-not-executed
+
+Implementation status: the training, export, validation, and audit code is
+implemented and covered by synthetic contract tests. Production GPU candidate
+fitting, production embedding export, and the independent audit have not been
+executed. The repository therefore does not yet contain a production
+`handoff_manifest.json`, `trial_results.csv`, or the four production NPZ files.
 
 ## Problem Statement
 
@@ -39,7 +45,7 @@ implementation details.
 1. As a training operator, I want to verify the LooseLeaf environment before training, so that GPU, package, and pretrained-model problems fail before expensive work begins.
 2. As a training operator, I want the setup stage to report Python, PyTorch, CUDA, GPU, pytorch-metric-learning, and pytorch-insightface versions, so that the run can be reproduced.
 3. As a training operator, I want the setup stage to assert that the processed dataset and manifest exist, so that missing local data is reported immediately.
-4. As a training operator, I want the setup stage to verify the actual split and class counts, so that stale estimates cannot silently change the experiment.
+4. As a training operator, I want the setup stage to verify the actual split and class counts, so that stale estimates cannot silently change the candidate-fitting plan.
 5. As a training operator, I want the setup stage to verify that every manifest identity maps to one valid original dataset row, so that identity joins cannot drift.
 6. As a training operator, I want a one-image pretrained-model smoke test, so that I know the model loads and produces a 512-dimensional embedding before starting candidate fits.
 7. As a training operator, I want a single visible configuration section, so that changes to seeds, candidate grids, and training controls are easy to review.
@@ -47,7 +53,7 @@ implementation details.
 9. As a training operator, I want three Triplet Margin candidate configurations at margins 0.1, 0.2, and 0.4, so that the loss's margin is tuned.
 10. As a training operator, I want four ArcFace candidate configurations over margins 0.2 and 0.4 and scales 30 and 64, so that both angular margin and scale are tuned.
 11. As a training operator, I want three SupCon candidate configurations at temperatures 0.07, 0.10, and 0.20, so that the contrastive temperature is tuned.
-12. As a training operator, I want exactly one stochastic candidate fit per candidate configuration, so that the planned search trains 10 candidate fits rather than undocumented repeated runs.
+12. As a training operator, I want exactly one stochastic candidate fit per candidate configuration, so that the planned search trains 10 candidate fits rather than undocumented additional fits.
 13. As a training operator, I want each candidate configuration to have a deterministic trial ID, so that its checkpoint, trial row, and selected status can be traced unambiguously.
 14. As a training operator, I want every candidate fit to fine-tune all IResNet-100 backbone parameters, so that each loss may subtly adjust pretrained facial representations.
 15. As a training operator, I want Adam configured with learning rate 1e-5, betas 0.9 and 0.999, and weight decay 0, so that optimization follows the agreed protocol.
@@ -123,8 +129,8 @@ implementation details.
   code derives counts and validates them against the documented expected
   values.
 - The training search consists of 10 candidate configurations: three Triplet
-  Margin, four ArcFace, and three SupCon. There is one candidate fit and one
-  root-seed experiment per configuration.
+  Margin, four ArcFace, and three SupCon. Each configuration has one
+  root-seeded candidate fit.
 - The root seed is 4002. Named child seeds are derived for sampler, augmentation,
   loss-level sampling, and bootstrap behavior; exhaustive evaluation is
   deterministic.

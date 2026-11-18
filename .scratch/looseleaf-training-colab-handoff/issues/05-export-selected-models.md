@@ -32,7 +32,7 @@ Evidence:
   fixtures without training or requiring GPU checkpoints.
 - `python -m unittest discover -s tests -v` passed all 34 tests.
 
-Comments:
+## Comments
 
 - Selected checkpoints remain below ignored `models/metric_learning/` and only
   their validation/test embeddings enter the handoff package.

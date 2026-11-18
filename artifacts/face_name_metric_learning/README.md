@@ -1,11 +1,18 @@
 # Face-name metric-learning handoff
 
-The handoff contains embeddings only: no face images, checkpoints, or model
-weights are required.
+> Status: **generation pending**. This repository currently contains the
+> handoff contract and executable pipeline, but production candidate fitting,
+> embedding export, and the independent audit have not been executed. The files
+> listed below must be generated before upload; do not treat this README as an
+> acceptance result.
+
+The generated handoff is designed to contain embeddings only: no face images,
+checkpoints, or model weights are required by the evaluator.
 
 ## Upload
 
-Upload `data/processed/manifest.csv` and this directory's:
+After production generation and a successful independent audit, upload
+`data/processed/manifest.csv` and this directory's:
 
 - `trial_results.csv`
 - `handoff_manifest.json`
@@ -75,9 +82,10 @@ accuracy, reported in percentage points.
 
 ## Paired bootstrap and outputs
 
-Use root seed 4002 and the named child-seed policy in the manifest to generate
-2,000 paired, name-stratified, image-level bootstrap replicates. Apply each
-sample's multiplicities to all four models. Exclude comparisons between
+Use root seed 4002 and derive named child seeds with concern `bootstrap` and
+scope `<model>/<split>` through the policy in the manifest to generate 2,000
+paired, name-stratified, image-level bootstrap replicates. Apply each sample's
+multiplicities to all four models. Exclude comparisons between
 duplicate draws of the same original `h5_index`, and use weighted precomputed
 similarity matrices rather than rebuilding triplets. Report a 95% interval for
 each fine-tuned model's lift; improvement is significant when it excludes zero.

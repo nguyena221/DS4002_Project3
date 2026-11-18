@@ -53,8 +53,8 @@ Shared settings:
   with additional training seeds.
 
 A candidate fit is one complete training trajectory for one loss/configuration
-and seed. A repeated run would train that identical configuration again with a
-different seed; repeated runs are out of scope.
+and seed. Fitting the identical configuration again with a different seed
+would be an additional candidate fit; such fits are out of scope.
 
 ### Loss-specific sampling
 
@@ -195,7 +195,13 @@ Use `schema_version: 1` with stable model filenames. Record:
 - Device used for candidate training.
 - Selected `trial_id` for Triplet, ArcFace, and SupCon.
 - NPZ shape, dtype, index coverage, and norm/finite checks.
-- The audit timestamp and pass/fail result.
+- The audit timestamp and `pass`, `fail`, or `not_run` result. A generated
+  manifest starts as `not_run`; only the independent audit may record `pass`.
+
+Production execution status: this repository currently contains the executable
+pipeline and a README template, but not production trial rows, a production
+manifest, or production embedding files. Generate and independently audit
+those files before treating the handoff as accepted.
 
 Do not add timestamps to the stable embedding filenames. Package history is
 tracked by Git and checksums.
@@ -280,8 +286,10 @@ Definitions:
 - `similarity_lift = fine_tuned_triplet_accuracy - baseline_triplet_accuracy`
 
 For uncertainty, run 2,000 paired, stratified image-level bootstrap replicates
-using the manifest's root-seed/child-seed policy. The same sampled original
-images and multiplicities must be applied to all four models. A comparison
+using the manifest's root-seed/child-seed policy, deriving one stream per
+`<model>/<split>` under the `bootstrap` concern. The same sampled original
+images and multiplicities must be applied to all four models for each
+comparison. A comparison
 still requires distinct original `h5_index` values, so duplicated bootstrap
 draws of one original image cannot be paired with each other. Use weighted
 counts from the similarity matrix rather than rebuilding/recomputing all
