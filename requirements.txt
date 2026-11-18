@@ -30,6 +30,7 @@ packaging==26.3
 pillow==13.0.0
 prettytable==3.18.0
 protobuf==7.36.2
+pytorch-metric-learning==2.8.1
 pydantic==2.14.3
 pydantic_core==2.50.4
 pyparsing==3.3.3
@@ -42,6 +43,7 @@ scipy==1.17.1
 simsimd==6.5.16
 stringzilla==5.3.2
 threadpoolctl==3.8.0
+torch==2.8.0
 tifffile==2026.3.3
 tqdm==4.70.1
 typing-inspection==0.4.5

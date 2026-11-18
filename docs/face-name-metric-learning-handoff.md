@@ -189,8 +189,8 @@ Use `schema_version: 1` with stable model filenames. Record:
 
 - Generation time in ISO UTC and Git commit hash when available.
 - SHA-256 checksums for `faces.h5`, `manifest.csv`, trial table, and each NPZ.
-- Exact Python, PyTorch, CUDA, pytorch-metric-learning, and
-  pytorch-insightface versions, plus the pretrained weight identifier/checksum.
+- Exact Python, PyTorch, CUDA, pytorch-metric-learning, and h5py versions,
+  plus the pretrained weight identifier/checksum.
 - Root seed, child-seed policy, split counts, class count, and metric definitions.
 - Device used for candidate training.
 - Selected `trial_id` for Triplet, ArcFace, and SupCon.

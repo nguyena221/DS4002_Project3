@@ -451,7 +451,7 @@ def append_trial_row(path, row):
 PACKAGE_DISTRIBUTIONS = {
     "pytorch": "torch",
     "pytorch_metric_learning": "pytorch-metric-learning",
-    "pytorch_insightface": "pytorch-insightface",
+    "h5py": "h5py",
 }
 
 
@@ -510,8 +510,12 @@ def write_environment_record(path, record):
 
 
 def _load_state_dict(model, checkpoint):
-    if hasattr(checkpoint, "keys") and "state_dict" in checkpoint:
-        checkpoint = checkpoint["state_dict"]
+    if hasattr(checkpoint, "keys"):
+        checkpoint = (
+            checkpoint.get("backbone_state_dict")
+            or checkpoint.get("state_dict")
+            or checkpoint
+        )
     if hasattr(checkpoint, "keys"):
         checkpoint = {key.removeprefix("module."): value for key, value in checkpoint.items()}
     model.load_state_dict(checkpoint, strict=True)
@@ -520,15 +524,17 @@ def _load_state_dict(model, checkpoint):
 def load_pretrained_iresnet100(
     pretrained_weights_path=None,
     *,
-    module_name="pytorch_insightface.backbones.iresnet",
+    module_name="face_name_metric_learning.iresnet",
     pretrained=True,
     device=None,
     expected_sha256=None,
 ):
-    """Load a trainable PyTorch IResNet-100 from the configured implementation."""
+    """Load a trainable IResNet-100 using the repository-owned implementation."""
     torch = importlib.import_module("torch")
     backbone_module = importlib.import_module(module_name)
-    factory = getattr(backbone_module, "iresnet100")
+    factory = getattr(backbone_module, "iresnet100", None) or getattr(
+        backbone_module, "build_iresnet100"
+    )
     signature = inspect.signature(factory)
     kwargs = {}
     if "pretrained" in signature.parameters and pretrained_weights_path is None:
