@@ -35,5 +35,8 @@ documented notebook/package paths without source images, model weights, or
 - `python -m unittest discover -s tests -v` passed all 38 tests.
 - Synchronized with integration tip
   `8c02ab2ed2577109d93e02ed10ba17324c731e64` (already up to date).
+- Merged the synchronized implementation with `--no-ff` as `793c79f`.
+- Re-ran the complete integration unit suite after merge:
+  `python -m unittest discover -s tests -v` (38 tests passed).
 - No production embeddings, checkpoints, downloads, or training runs were
   generated.
