@@ -40,6 +40,7 @@ from .training import (
     write_trial_ledger,
 )
 from .audit import audit_handoff_package
+from .acceptance import evaluate_handoff_package
 
 __all__ = [
     "align_embeddings",
@@ -47,6 +48,7 @@ __all__ = [
     "build_handoff_manifest",
     "build_handoff_manifest_from_environment",
     "collect_environment_record",
+    "evaluate_handoff_package",
     "export_baseline_embeddings",
     "export_selected_embeddings",
     "load_embedding_package",
