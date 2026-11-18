@@ -200,7 +200,7 @@ class EndToEndAcceptanceTests(unittest.TestCase):
                 )
         self.assertNotIn("faces.h5", [path.name for path in consumer.rglob("*")])
 
-    def test_acceptance_uses_a_named_bootstrap_seed_for_each_model_and_split(self):
+    def test_acceptance_shares_named_bootstrap_draws_across_models_per_split(self):
         result = evaluate_handoff_package(
             self.package_dir,
             manifest_path=self.manifest_path,
@@ -236,7 +236,7 @@ class EndToEndAcceptanceTests(unittest.TestCase):
             names,
             replicates=10,
             seed=named_child_seed(
-                4002, "bootstrap", "triplet_margin_selected/validation"
+                4002, "bootstrap", "validation"
             ),
         )
         np.testing.assert_allclose(
@@ -245,6 +245,14 @@ class EndToEndAcceptanceTests(unittest.TestCase):
             ],
             expected["similarity_lifts"],
         )
+        baseline_draws = [
+            result["bootstrap"][model]["validation"][
+                "baseline_triplet_accuracies"
+            ]
+            for model in result["bootstrap"]
+        ]
+        for draws in baseline_draws[1:]:
+            np.testing.assert_array_equal(draws, baseline_draws[0])
 
     def test_documented_handoff_and_notebook_paths_exist_and_match(self):
         readme = (

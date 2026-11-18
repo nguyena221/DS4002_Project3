@@ -82,8 +82,8 @@ accuracy, reported in percentage points.
 
 ## Paired bootstrap and outputs
 
-Use root seed 4002 and derive named child seeds with concern `bootstrap` and
-scope `<model>/<split>` through the policy in the manifest to generate 2,000
+Use root seed 4002 and derive one named child seed per split with concern
+`bootstrap` and scope `<split>` through the policy in the manifest to generate 2,000
 paired, name-stratified, image-level bootstrap replicates. Apply each sample's
 multiplicities to all four models. Exclude comparisons between
 duplicate draws of the same original `h5_index`, and use weighted precomputed
