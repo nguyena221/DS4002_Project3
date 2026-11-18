@@ -1,6 +1,7 @@
 # Fresh-environment handoff acceptance
 
-Status: ready-for-agent
+Status: resolved
+Claimed by: GitHub Copilot
 Type: task
 Blocked by: 06
 
@@ -20,3 +21,19 @@ References:
 
 - [spec](../spec.md)
 - [handoff design](../../../docs/face-name-metric-learning-handoff.md)
+
+## Answer
+
+Added a public fresh-evaluator helper and synthetic end-to-end acceptance
+fixture. The copied package validates shared schemas, selections, checksums,
+embedding invariants, direct/blocked metrics, paired bootstrap outputs, and
+documented notebook/package paths without source images, model weights, or
+`faces.h5`.
+
+## Evidence
+
+- `python -m unittest discover -s tests -v` passed all 38 tests.
+- Synchronized with integration tip
+  `8c02ab2ed2577109d93e02ed10ba17324c731e64` (already up to date).
+- No production embeddings, checkpoints, downloads, or training runs were
+  generated.

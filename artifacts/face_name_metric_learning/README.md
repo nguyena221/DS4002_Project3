@@ -59,7 +59,12 @@ For every model and each evaluation split, require:
 - unique `int64` indices covering that manifest split exactly once;
 - `float32` finite embeddings of shape `(split_rows, 512)`;
 - row L2 norms within `1e-5` of 1; and
-- every SHA-256 value in `handoff_manifest.json` matching the copied file.
+- every SHA-256 value for an uploaded file in `handoff_manifest.json` matching
+  its copied file.
+
+The recorded `faces.h5` checksum is a source-data fingerprint and is not
+verifiable in Colab because the file is intentionally not uploaded. All copied
+package/shared-file checksums are still asserted directly.
 
 Triplet accuracy is `correct / total_valid_comparisons`: a positive has the
 same `first_name` and a different `h5_index`; a negative has a different

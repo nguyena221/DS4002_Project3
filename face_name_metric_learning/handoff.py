@@ -3,6 +3,7 @@
 import csv
 import hashlib
 import json
+import re
 from datetime import datetime, timezone
 from collections import Counter
 from pathlib import Path
@@ -466,7 +467,7 @@ def _manifest_inputs(
 ):
     package_dir = Path(package_dir)
     return {
-        "faces.h5": Path(hdf5_path),
+        "faces.h5": Path(hdf5_path) if hdf5_path is not None else None,
         "manifest.csv": Path(manifest_path),
         "trial_results.csv": Path(trial_results_path),
         **{
@@ -677,6 +678,14 @@ def validate_handoff_manifest(
     _require(isinstance(checksums, dict), "checksums", "must be an object")
     _require(set(checksums) == set(inputs), "checksums", f"expected exactly {sorted(inputs)}")
     for name, path in inputs.items():
+        if path is None:
+            _require(
+                isinstance(checksums[name], str)
+                and re.fullmatch(r"[0-9a-f]{64}", checksums[name]) is not None,
+                f"checksums.{name}",
+                "must be a lowercase SHA-256 digest",
+            )
+            continue
         actual = sha256_file(path)
         _require(checksums[name] == actual, f"checksums.{name}", f"checksum mismatch: expected {actual}")
 
