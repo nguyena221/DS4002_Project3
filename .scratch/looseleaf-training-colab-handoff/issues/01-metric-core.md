@@ -1,6 +1,6 @@
 # Metric core and blocked exhaustive evaluation
 
-Status: ready-for-agent
+Status: claimed
 Type: task
 Blocked by:
 
