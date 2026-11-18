@@ -43,7 +43,7 @@ implementation details.
 ## User Stories
 
 1. As a training operator, I want to verify the LooseLeaf environment before training, so that GPU, package, and pretrained-model problems fail before expensive work begins.
-2. As a training operator, I want the setup stage to report Python, PyTorch, CUDA, GPU, pytorch-metric-learning, and pytorch-insightface versions, so that the run can be reproduced.
+2. As a training operator, I want the setup stage to report Python, PyTorch, CUDA, GPU, pytorch-metric-learning, and h5py versions, so that the run can be reproduced.
 3. As a training operator, I want the setup stage to assert that the processed dataset and manifest exist, so that missing local data is reported immediately.
 4. As a training operator, I want the setup stage to verify the actual split and class counts, so that stale estimates cannot silently change the candidate-fitting plan.
 5. As a training operator, I want the setup stage to verify that every manifest identity maps to one valid original dataset row, so that identity joins cannot drift.

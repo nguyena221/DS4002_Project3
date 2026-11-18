@@ -88,17 +88,31 @@ def build_iresnet100():
     return IResNet()
 
 
-def load_iresnet100(checkpoint_path, device):
-    """Load pretrained IResNet-100 weights without downloading anything."""
+def load_iresnet100(checkpoint_path, device, *, expected_sha256=None):
+    """Strictly load local IResNet-100 weights without downloading anything."""
     import torch
+    from pathlib import Path
+
+    checkpoint_path = Path(checkpoint_path)
+    if not checkpoint_path.is_file():
+        raise FileNotFoundError(
+            f"pretrained_weights_path: {checkpoint_path} does not exist"
+        )
+    if expected_sha256 is not None:
+        from .handoff import sha256_file
+
+        if sha256_file(checkpoint_path) != expected_sha256:
+            raise ValueError("pretrained_weights.sha256: checksum mismatch")
 
     model = build_iresnet100()
     checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
-    state = (
-        checkpoint.get("backbone_state_dict")
-        or checkpoint.get("state_dict")
-        or checkpoint
-    )
+    state = checkpoint
+    if hasattr(checkpoint, "get"):
+        state = (
+            checkpoint.get("backbone_state_dict")
+            or checkpoint.get("state_dict")
+            or checkpoint
+        )
     state = {
         key.removeprefix("module."): value
         for key, value in state.items()

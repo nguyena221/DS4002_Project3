@@ -240,7 +240,7 @@ class SelectedExportContractTests(unittest.TestCase):
                     "packages": {
                         "pytorch": "2.0",
                         "pytorch_metric_learning": "2.0",
-                        "pytorch_insightface": "0.7.3",
+                        "h5py": "3.16.0",
                     },
                     "cuda": "12.0",
                     "device": "cuda:0",

@@ -426,7 +426,7 @@ VERSION_FIELDS = {
     "pytorch",
     "cuda",
     "pytorch_metric_learning",
-    "pytorch_insightface",
+    "h5py",
 }
 TRIPLET_ACCURACY_DEFINITION = (
     "correct_predictions / total_valid_comparisons, where cosine similarity is "
@@ -602,7 +602,7 @@ def build_handoff_manifest_from_environment(
         "pytorch": packages.get("pytorch"),
         "cuda": environment.get("cuda"),
         "pytorch_metric_learning": packages.get("pytorch_metric_learning"),
-        "pytorch_insightface": packages.get("pytorch_insightface"),
+        "h5py": packages.get("h5py"),
     }
     versions = {
         name: str(value) if value is not None else ""
