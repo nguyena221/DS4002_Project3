@@ -1,4 +1,4 @@
-"""Public utilities for the face-name metric-learning handoff."""
+﻿"""Public utilities for the face-name metric-learning handoff."""
 
 from .handoff import (
     align_embeddings,
@@ -15,10 +15,26 @@ from .handoff import (
     write_embedding_package,
 )
 from .training import (
+    DEFAULT_TRAINING_CONFIG,
+    BestEpochSelector,
+    CandidateConfiguration,
+    NameBalancedBatchPlan,
+    TrainingConfig,
+    append_trial_row,
+    candidate_configurations,
+    child_seed,
     collect_environment_record,
     export_baseline_embeddings,
+    initialize_trial_ledger,
     load_pretrained_iresnet100,
+    loss_contract,
+    select_candidates,
+    shuffled_name_balanced_batches,
+    supcon_positive_mask,
+    trial_checkpoint_path,
+    triplet_indices,
     write_environment_record,
+    write_trial_ledger,
 )
 
 __all__ = [
@@ -38,4 +54,20 @@ __all__ = [
     "write_handoff_manifest",
     "write_environment_record",
     "write_embedding_package",
+    "DEFAULT_TRAINING_CONFIG",
+    "BestEpochSelector",
+    "CandidateConfiguration",
+    "NameBalancedBatchPlan",
+    "TrainingConfig",
+    "append_trial_row",
+    "candidate_configurations",
+    "child_seed",
+    "initialize_trial_ledger",
+    "loss_contract",
+    "select_candidates",
+    "shuffled_name_balanced_batches",
+    "supcon_positive_mask",
+    "trial_checkpoint_path",
+    "triplet_indices",
+    "write_trial_ledger",
 ]

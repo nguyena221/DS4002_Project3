@@ -1,6 +1,6 @@
 # Candidate fitting and model selection
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 Blocked by: 01, 02
 
@@ -22,4 +22,10 @@ References:
 
 - [spec](../spec.md)
 - [handoff design](../../../docs/face-name-metric-learning-handoff.md)
+
+Evidence:
+
+- Implementation `9c19a74`; synchronized with integration tip `46bb38d`.
+- All 27 tests passed with `python -m unittest discover -s tests -v`.
+- Notebook JSON, cleared outputs, and all code-cell syntax validated.
 
