@@ -1,6 +1,6 @@
 # Candidate fitting and model selection
 
-Status: ready-for-agent
+Status: claimed
 Type: task
 Blocked by: 01, 02
 
