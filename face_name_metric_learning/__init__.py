@@ -39,9 +39,11 @@ from .training import (
     write_environment_record,
     write_trial_ledger,
 )
+from .audit import audit_handoff_package
 
 __all__ = [
     "align_embeddings",
+    "audit_handoff_package",
     "build_handoff_manifest",
     "build_handoff_manifest_from_environment",
     "collect_environment_record",

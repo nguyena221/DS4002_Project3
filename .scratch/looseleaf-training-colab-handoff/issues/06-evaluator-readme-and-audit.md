@@ -1,6 +1,6 @@
 # Evaluator README and package audit
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 Blocked by: 05
 
@@ -20,4 +20,11 @@ References:
 
 - [spec](../spec.md)
 - [handoff design](../../../docs/face-name-metric-learning-handoff.md)
+
+## Answer
+
+Added the evaluator handoff README, a public weights-free package audit helper,
+synthetic contract tests, and the ignored local audit notebook. The audit
+reloads and aligns all artifacts, validates the manifest contract and checksums,
+replays a deterministic metric check, and persists pass/fail audit metadata.
 
