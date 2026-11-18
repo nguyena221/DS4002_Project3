@@ -1,6 +1,6 @@
 # Metric core and blocked exhaustive evaluation
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 Blocked by:
 
@@ -23,4 +23,9 @@ References:
 - [spec](../spec.md)
 - [handoff design](../../../docs/face-name-metric-learning-handoff.md)
 - [glossary](../../../GLOSSARY.md)
+
+Comments:
+
+- Integrated as merge commit `93a5740`; implementation commit `a82a303`.
+  Verified with `python -m unittest discover -s tests -v` (6 tests passed).
 
