@@ -1,6 +1,7 @@
 # Setup and baseline export
 
-Status: ready-for-agent
+Status: resolved
+Claimed by: GitHub Copilot
 Type: task
 Blocked by: 02
 
@@ -21,4 +22,13 @@ References:
 
 - [spec](../spec.md)
 - [handoff design](../../../docs/face-name-metric-learning-handoff.md)
+
+Evidence:
+
+- Implemented on `feature/ticket-03-setup-baseline`.
+- Added cleared, fail-fast setup/smoke-test and baseline-export notebooks.
+- Added reusable environment recording, pretrained-model loading, and HDF5
+  validation/test export helpers.
+- Verified notebook schemas and the public embedding artifact contract with
+  `python -m unittest discover -s tests -v` (19 tests passed).
 
