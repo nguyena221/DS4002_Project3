@@ -29,3 +29,11 @@ Evidence:
 - All 27 tests passed with `python -m unittest discover -s tests -v`.
 - Notebook JSON, cleared outputs, and all code-cell syntax validated.
 
+Comments:
+
+- Synchronized the implementation branch with integration tip `ec756a4` as
+  `3d0a589`, preserving ticket 03's baseline helpers alongside ticket 04.
+- Merged the synchronized implementation with `--no-ff` as `2b209d3`.
+- Re-ran the complete integration unit suite after merge:
+  `python -m unittest discover -s tests -v` (30 tests passed).
+
