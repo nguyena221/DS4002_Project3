@@ -9,6 +9,7 @@ from face_name_metrics import (
     direct_triplet_accuracy,
     paired_bootstrap_statistics,
 )
+from .training import named_child_seed
 
 from .handoff import (
     MODEL_FILENAMES,
@@ -18,6 +19,25 @@ from .handoff import (
     read_manifest,
     validate_handoff_manifest,
 )
+
+
+def handoff_package_readiness(package_dir):
+    """Report whether generated production inputs are present."""
+    package_dir = Path(package_dir)
+    expected = (
+        "trial_results.csv",
+        "handoff_manifest.json",
+        *(f"embeddings/{filename}" for filename in MODEL_FILENAMES.values()),
+    )
+    missing = [
+        relative
+        for relative in expected
+        if not (package_dir / relative).is_file()
+    ]
+    return {
+        "status": "ready" if not missing else "pending",
+        "missing": missing,
+    }
 
 
 def evaluate_handoff_package(
@@ -133,7 +153,11 @@ def evaluate_handoff_package(
                     [row["first_name"] for row in target_rows], dtype=object
                 ),
                 replicates=bootstrap_replicates,
-                seed=int(metadata["root_seed"]),
+                seed=named_child_seed(
+                    metadata["root_seed"],
+                    "bootstrap",
+                    f"{model}/{split}",
+                ),
             )
             bootstrap[model][split] = {
                 "confidence_interval": (

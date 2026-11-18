@@ -1,6 +1,6 @@
 # Fresh-environment handoff acceptance
 
-Status: resolved
+Status: pending-production-artifacts
 Claimed by: GitHub Copilot
 Type: task
 Blocked by: 06
@@ -25,18 +25,20 @@ References:
 ## Answer
 
 Added a public fresh-evaluator helper and synthetic end-to-end acceptance
-fixture. The copied package validates shared schemas, selections, checksums,
+fixture. Synthetic copied packages validate schemas, selections, checksums,
 embedding invariants, direct/blocked metrics, paired bootstrap outputs, and
 documented notebook/package paths without source images, model weights, or
-`faces.h5`.
+`faces.h5`. Production acceptance remains pending because production candidate
+fitting, production exports, and the independent audit have not been executed.
 
 ## Evidence
 
-- `python -m unittest discover -s tests -v` passed all 38 tests.
+- Synthetic contract acceptance is covered by the complete public unit suite:
+  `python -m unittest discover -s tests -v` (41 tests passed).
 - Synchronized with integration tip
   `8c02ab2ed2577109d93e02ed10ba17324c731e64` (already up to date).
 - Merged the synchronized implementation with `--no-ff` as `793c79f`.
-- Re-ran the complete integration unit suite after merge:
-  `python -m unittest discover -s tests -v` (38 tests passed).
-- No production embeddings, checkpoints, downloads, or training runs were
-  generated.
+- Production readiness is reported as `pending` with the missing production
+  trial table, manifest, and four NPZ files enumerated.
+- No production embeddings, checkpoints, downloads, or candidate fits were
+  generated, so no production pass is claimed.

@@ -32,7 +32,7 @@ Evidence:
 - Verified notebook schemas and the public embedding artifact contract with
   `python -m unittest discover -s tests -v` (19 tests passed).
 
-Comments:
+## Comments
 
 - Implementation `c9fe0c7` already contained the latest integration tip
   `46bb38d`; merged with `--no-ff` as `d9362d4`.

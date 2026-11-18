@@ -315,13 +315,13 @@ class HandoffManifestContractTests(unittest.TestCase):
             class_count=1,
             generated_at="2026-11-18T18:00:00Z",
             git_commit="abc123",
-            audit={"status": "pass", "timestamp": "2026-11-18T18:01:00Z"},
         )
 
     def test_builds_schema_v1_checksums_selections_and_metric_definitions(self):
         metadata = self.build()
 
         self.assertEqual(metadata["schema_version"], 1)
+        self.assertEqual(metadata["audit"], {"status": "not_run"})
         self.assertEqual(metadata["selected_trials"]["arcface"], "trial-3")
         self.assertEqual(metadata["checksums"]["manifest.csv"], hashlib.sha256(self.manifest_path.read_bytes()).hexdigest())
         self.assertIn("strictly greater", metadata["metric_definitions"]["triplet_accuracy"])
@@ -333,6 +333,31 @@ class HandoffManifestContractTests(unittest.TestCase):
             trial_results_path=self.trial_path,
             expected_dimension=2,
         ), metadata)
+
+    def test_manifest_builder_cannot_preempt_the_independent_audit(self):
+        with self.assertRaisesRegex(ValueError, r"audit\.status"):
+            build_handoff_manifest(
+                self.package_dir,
+                manifest_path=self.manifest_path,
+                hdf5_path=self.hdf5_path,
+                trial_results_path=self.trial_path,
+                versions=self.versions,
+                pretrained_weights={
+                    "identifier": "insightface-iresnet100",
+                    "sha256": "weight-checksum",
+                },
+                device="cuda:0",
+                child_seed_policy="named deterministic streams",
+                expected_dimension=2,
+                split_counts={"train": 0, "validation": 1, "test": 1},
+                class_count=1,
+                generated_at="2026-11-18T18:00:00Z",
+                git_commit="abc123",
+                audit={
+                    "status": "pass",
+                    "timestamp": "2026-11-18T18:01:00Z",
+                },
+            )
 
     def test_rejects_a_checksum_or_selected_id_that_does_not_match_inputs(self):
         metadata = self.build()
