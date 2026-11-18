@@ -38,4 +38,7 @@ Comments:
   their validation/test embeddings enter the handoff package.
 - Synchronized with the latest local integration tip
   `41fa98915b4b9d266aed26e8bcf4ee7732d172c3`.
+- Merged the synchronized implementation with `--no-ff` as `6f8be5b`.
+- Re-ran the complete integration unit suite after merge:
+  `python -m unittest discover -s tests -v` (34 tests passed).
 
