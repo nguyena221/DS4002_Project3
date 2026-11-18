@@ -1,6 +1,6 @@
 # Handoff artifact contract and integrity I/O
 
-Status: claimed
+Status: resolved
 Type: task
 Blocked by:
 
@@ -22,4 +22,10 @@ References:
 
 - [spec](../spec.md)
 - [handoff design](../../../docs/face-name-metric-learning-handoff.md)
+
+Evidence:
+
+- Implementation `6fbf6e7`; synchronized with integration in `847a70b` and
+  merged via `5033043` (`--no-ff`).
+- All 16 tests passed with `python -m unittest discover -s tests -v`.
 
