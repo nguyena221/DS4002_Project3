@@ -287,7 +287,7 @@ Definitions:
 
 For uncertainty, run 2,000 paired, stratified image-level bootstrap replicates
 using the manifest's root-seed/child-seed policy, deriving one stream per
-`<model>/<split>` under the `bootstrap` concern. The same sampled original
+`<split>` under the `bootstrap` concern. The same sampled original
 images and multiplicities must be applied to all four models for each
 comparison. A comparison
 still requires distinct original `h5_index` values, so duplicated bootstrap

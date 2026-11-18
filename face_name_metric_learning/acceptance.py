@@ -8,6 +8,7 @@ from face_name_metrics import (
     blocked_triplet_accuracy,
     direct_triplet_accuracy,
     paired_bootstrap_statistics,
+    stratified_bootstrap_multiplicities,
 )
 from .training import named_child_seed
 
@@ -137,6 +138,20 @@ def evaluate_handoff_package(
                 accuracy - baseline
             )
 
+    draw_weights = {
+        split: stratified_bootstrap_multiplicities(
+            np.asarray(
+                [row["first_name"] for row in target_rows], dtype=object
+            ),
+            replicates=bootstrap_replicates,
+            seed=named_child_seed(
+                metadata["root_seed"],
+                "bootstrap",
+                split,
+            ),
+        )
+        for split, target_rows in split_rows.items()
+    }
     bootstrap = {}
     for model in MODEL_FILENAMES:
         if model == baseline_model:
@@ -153,11 +168,7 @@ def evaluate_handoff_package(
                     [row["first_name"] for row in target_rows], dtype=object
                 ),
                 replicates=bootstrap_replicates,
-                seed=named_child_seed(
-                    metadata["root_seed"],
-                    "bootstrap",
-                    f"{model}/{split}",
-                ),
+                draw_weights=draw_weights[split],
             )
             bootstrap[model][split] = {
                 "confidence_interval": (

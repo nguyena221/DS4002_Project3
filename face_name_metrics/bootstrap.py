@@ -33,6 +33,7 @@ def paired_bootstrap_statistics(
     *,
     replicates=2000,
     seed=4002,
+    draw_weights=None,
     confidence_level=0.95,
 ):
     """Compute paired model accuracies and a similarity-lift interval."""
@@ -52,9 +53,17 @@ def paired_bootstrap_statistics(
 
     baseline_similarities = pairwise_cosine_similarity(baseline_embeddings)
     comparison_similarities = pairwise_cosine_similarity(comparison_embeddings)
-    draw_weights = stratified_bootstrap_multiplicities(
-        first_names, replicates=replicates, seed=seed
-    )
+    if draw_weights is None:
+        draw_weights = stratified_bootstrap_multiplicities(
+            first_names, replicates=replicates, seed=seed
+        )
+    else:
+        draw_weights = np.asarray(draw_weights)
+        expected_shape = (replicates, baseline_embeddings.shape[0])
+        if draw_weights.shape != expected_shape:
+            raise ValueError(
+                f"draw_weights must have shape {expected_shape}"
+            )
     baseline_accuracies = np.empty(replicates, dtype=np.float64)
     comparison_accuracies = np.empty(replicates, dtype=np.float64)
     for replicate, multiplicities in enumerate(draw_weights):
