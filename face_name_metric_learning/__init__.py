@@ -1,4 +1,4 @@
-"""Public utilities for the face-name metric-learning handoff."""
+﻿"""Public utilities for the face-name metric-learning handoff."""
 
 from .handoff import (
     align_embeddings,
@@ -23,20 +23,27 @@ from .training import (
     append_trial_row,
     candidate_configurations,
     child_seed,
+    collect_environment_record,
+    export_baseline_embeddings,
     initialize_trial_ledger,
+    load_pretrained_iresnet100,
     loss_contract,
     select_candidates,
     shuffled_name_balanced_batches,
     supcon_positive_mask,
     trial_checkpoint_path,
     triplet_indices,
+    write_environment_record,
     write_trial_ledger,
 )
 
 __all__ = [
     "align_embeddings",
     "build_handoff_manifest",
+    "collect_environment_record",
+    "export_baseline_embeddings",
     "load_embedding_package",
+    "load_pretrained_iresnet100",
     "read_handoff_manifest",
     "read_manifest",
     "sha256_file",
@@ -45,6 +52,7 @@ __all__ = [
     "validate_manifest_hdf5",
     "validate_trial_ledger",
     "write_handoff_manifest",
+    "write_environment_record",
     "write_embedding_package",
     "DEFAULT_TRAINING_CONFIG",
     "BestEpochSelector",
