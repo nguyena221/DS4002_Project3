@@ -24,6 +24,16 @@ from .training import (
 )
 from face_name_metrics import blocked_triplet_accuracy
 
+_IMAGES_CACHE = {}
+
+def _get_images(hdf5_path):
+    key = str(Path(hdf5_path).resolve())
+    if key not in _IMAGES_CACHE:
+        print(f"Loading {key} into RAM (~9.7 GB, one-time)...", flush=True)
+        with h5py.File(hdf5_path, "r") as f:
+            _IMAGES_CACHE[key] = f["images"][:]
+        print("Loaded into RAM.", flush=True)
+    return _IMAGES_CACHE[key]
 
 def _require_cuda(torch):
     if not torch.cuda.is_available():
@@ -101,10 +111,8 @@ def _training_loss(torch, candidate, criterion, embeddings, labels, loss_rng):
         raise ValueError(f"unknown loss {candidate.loss!r}") from error
 
 
-def _read_training_batch(hdf5, source_positions, augmentation_rng, flip_probability):
-    sorted_positions = np.sort(source_positions)
-    batch = np.asarray(hdf5["images"][sorted_positions.tolist()])
-    batch = batch[np.searchsorted(sorted_positions, source_positions)]
+def _read_training_batch(images_array, source_positions, augmentation_rng, flip_probability):
+    batch = images_array[source_positions]
     flips = augmentation_rng.random(len(batch)) < flip_probability
     batch[flips] = batch[flips, :, :, ::-1]
     return batch
@@ -112,14 +120,12 @@ def _read_training_batch(hdf5, source_positions, augmentation_rng, flip_probabil
 
 def _validation_embeddings(torch, model, hdf5_path, validation_indices, batch_size):
     model.eval()
+    images_array = _get_images(hdf5_path)
     batches = []
-    with h5py.File(hdf5_path, "r") as hdf5, torch.inference_mode():
+    with torch.inference_mode():
         for start in range(0, len(validation_indices), batch_size):
             positions = validation_indices[start : start + batch_size]
-            sorted_positions = np.sort(positions)
-            images = np.asarray(hdf5["images"][sorted_positions.tolist()])
-            images = images[np.searchsorted(sorted_positions, positions)]
-            images = torch.from_numpy(images).to("cuda")
+            images = torch.from_numpy(images_array[positions]).to("cuda")
             embeddings = model(images)
             batches.append(
                 torch.nn.functional.normalize(embeddings, dim=1)
@@ -211,7 +217,7 @@ def train_candidate(
     _seed_runtime(torch, child_seed(candidate, "runtime-initialization"))
     repository_root = Path(repository_root)
     hdf5_path = Path(hdf5_path)
-    checkpoint_path = trial_checkpoint_path(repository_root, candidate)
+    checkpoint_path = trial_checkpoint_path(repository_root, candidate.trial_id)
     checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
 
     train_h5_index, train_labels = _load_manifest_arrays(manifest_rows, "train")
@@ -259,7 +265,8 @@ def train_candidate(
     )
     early_stopped = False
     images_seen = 0
-
+    images_array = _get_images(hdf5_path)
+    
     for epoch in range(1, config.max_epochs + 1):
         model.train()
         batch_rng = np.random.default_rng(
@@ -271,29 +278,28 @@ def train_candidate(
         loss_rng = np.random.default_rng(
             child_seed(candidate, f"loss-sampling/epoch-{epoch}")
         )
-        with h5py.File(hdf5_path, "r") as hdf5:
-            for batch_positions in shuffled_name_balanced_batches(
-                train_h5_index, train_labels, plan, batch_rng
-            ):
-                source_positions = train_h5_index[batch_positions]
-                images = _read_training_batch(
-                    hdf5,
-                    source_positions,
-                    augmentation_rng,
-                    config.flip_probability,
+        for batch_positions in shuffled_name_balanced_batches(
+            train_h5_index, train_labels, plan, batch_rng
+        ):
+            source_positions = train_h5_index[batch_positions]
+            images = _read_training_batch(
+                images_array,
+                source_positions,
+                augmentation_rng,
+                config.flip_probability,
+            )
+            labels = torch.from_numpy(train_labels[batch_positions]).to(device)
+            images = torch.from_numpy(images).to(device)
+            optimizer.zero_grad(set_to_none=True)
+            with torch.amp.autocast("cuda"):
+                embeddings = model(images)
+                loss = _training_loss(
+                    torch, candidate, criterion, embeddings, labels, loss_rng
                 )
-                labels = torch.from_numpy(train_labels[batch_positions]).to(device)
-                images = torch.from_numpy(images).to(device)
-                optimizer.zero_grad(set_to_none=True)
-                with torch.amp.autocast("cuda"):
-                    embeddings = model(images)
-                    loss = _training_loss(
-                        torch, candidate, criterion, embeddings, labels, loss_rng
-                    )
-                scaler.scale(loss).backward()
-                scaler.step(optimizer)
-                scaler.update()
-                images_seen += len(images)
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+            images_seen += len(images)
 
         validation_embeddings = _validation_embeddings(
             torch, model, hdf5_path, validation_h5_index, 256
@@ -305,19 +311,23 @@ def train_candidate(
             block_size=config.validation_block_size,
         )
         improved = selection.observe(epoch, accuracy)
+        print(
+            f"[{candidate.trial_id}] epoch {epoch}/{config.max_epochs} "
+            f"val_acc={accuracy:.4f} best={selection.best_accuracy:.4f} "
+            f"improved={improved}",
+            flush=True,
+        )
         if improved:
-            torch.save(
-                {
-                    "trial_id": candidate.trial_id,
-                    "loss": candidate.loss,
-                    "hyperparameters": dict(candidate.hyperparameters),
-                    "seed": candidate.seed,
-                    "best_epoch": epoch,
-                    "best_validation_triplet_accuracy": float(accuracy),
-                    "backbone_state_dict": model.state_dict(),
-                },
-                checkpoint_path,
-            )
+            checkpoint = {
+                "trial_id": candidate.trial_id,
+                "loss": candidate.loss,
+                "hyperparameters": dict(candidate.hyperparameters),
+                "seed": candidate.seed,
+                "best_epoch": epoch,
+                "best_validation_triplet_accuracy": float(accuracy),
+                "backbone_state_dict": model.state_dict(),
+            }
+            torch.save(checkpoint, checkpoint_path)
         if selection.should_stop:
             early_stopped = True
             break
@@ -364,14 +374,37 @@ def train_and_select_candidates(
     pretrained_checkpoint_path,
     manifest_rows,
     config=DEFAULT_TRAINING_CONFIG,
+    max_new_trials=None,
 ):
-    """Run each candidate exactly once, persist the ledger, and mark selections."""
+    """Run each candidate once (resuming from existing ledger), persist, and mark selections."""
+    import csv
+
     candidates = candidate_configurations(config.root_seed)
     if len(candidates) != 10:
         raise RuntimeError("candidate grid must contain exactly ten configurations")
-    initialize_trial_ledger(trial_results_path)
-    rows = []
+
+    trial_results_path = Path(trial_results_path)
+    if trial_results_path.is_file() and trial_results_path.stat().st_size > 0:
+        with trial_results_path.open("r", newline="", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+    else:
+        initialize_trial_ledger(trial_results_path)
+        rows = []
+
+    completed_ids = {row["trial_id"] for row in rows}
+    ran_this_call = 0
+
     for candidate in candidates:
+        if candidate.trial_id in completed_ids:
+            print(f"[{candidate.trial_id}] already in ledger, skipping.", flush=True)
+            continue
+        if max_new_trials is not None and ran_this_call >= max_new_trials:
+            print(
+                f"Reached max_new_trials={max_new_trials} ({len(rows)}/10 complete). "
+                "Run the next cell to continue.",
+                flush=True,
+            )
+            break
         row = train_candidate(
             candidate,
             repository_root=repository_root,
@@ -383,6 +416,13 @@ def train_and_select_candidates(
         )
         append_trial_row(trial_results_path, row)
         rows.append(row)
-    selected = select_candidates(rows)
-    write_trial_ledger(trial_results_path, selected)
-    return selected
+        completed_ids.add(candidate.trial_id)
+        ran_this_call += 1
+
+    if len(rows) == 10:
+        selected = select_candidates(rows)
+        write_trial_ledger(trial_results_path, selected)
+        return selected
+
+    print(f"Progress: {len(rows)}/10 trials complete.", flush=True)
+    return rows

@@ -1,0 +1,72 @@
+{
+  "audit": {
+    "status": "not_run"
+  },
+  "checksums": {
+    "embeddings/arcface_selected.npz": "82b3194b247890c1c12f0f5c0393829a63a4503cb0d2887e131c71a9b48decef",
+    "embeddings/baseline_iresnet100.npz": "ca48f9d10325e926eae54cb42ac5c8481c722529c291788daa6682bd529a3fe1",
+    "embeddings/supcon_selected.npz": "a6b479460b9994159e498cac3d8ac9ac8a3a42f92ec8bced39a26c9bc0106dac",
+    "embeddings/triplet_margin_selected.npz": "38c7c83c71b04189bcd7a8c2ff36b022dd45d84c98338ee8a384e11262400500",
+    "faces.h5": "e235110bdda50cd445dc1cf8ceaa09f4be645b057e2be24ad34820ea5cbc45ff",
+    "manifest.csv": "209735cbef76f08814c33ed8cf99a1fb90cdb4edae85431748b752678e5abf50",
+    "trial_results.csv": "9feca0b5f4fd93ac832639efc7315194f215fa774cd7d176c842a3a32dc360ec"
+  },
+  "child_seed_policy": "SHA-256 named child streams by trial and concern",
+  "class_count": 100,
+  "device": "cuda",
+  "embedding_validation": {
+    "embedding_dimension": 512,
+    "embedding_dtype": "float32",
+    "finite": true,
+    "index_coverage": "exactly once per manifest split",
+    "index_dtype": "int64",
+    "unit_norm_tolerance": 1e-05
+  },
+  "generated_at": "2026-11-19T16:42:17Z",
+  "git_commit": "aff4ed8493c1b104dc99e85adfcccee854359100",
+  "metric_definitions": {
+    "similarity_lift": "fine_tuned_triplet_accuracy - baseline_triplet_accuracy, expressed as a signed difference in percentage points",
+    "triplet_accuracy": "correct_predictions / total_valid_comparisons, where cosine similarity is strictly greater for the positive than the negative and ties are incorrect"
+  },
+  "models": {
+    "arcface_selected": {
+      "filename": "embeddings/arcface_selected.npz",
+      "selected_trial_id": "arcface_m0p2_s30_seed4002"
+    },
+    "baseline_iresnet100": {
+      "filename": "embeddings/baseline_iresnet100.npz",
+      "selected_trial_id": null
+    },
+    "supcon_selected": {
+      "filename": "embeddings/supcon_selected.npz",
+      "selected_trial_id": "supcon_t0p2_seed4002"
+    },
+    "triplet_margin_selected": {
+      "filename": "embeddings/triplet_margin_selected.npz",
+      "selected_trial_id": "triplet_margin0p4_seed4002"
+    }
+  },
+  "pretrained_weights": {
+    "identifier": "local-converted:iresnet100",
+    "sha256": "8a51c4a5607d4d6db1e160562a01721b7b6516645d62325be47e36cf15eb9e59"
+  },
+  "root_seed": 4002,
+  "schema_version": 1,
+  "selected_trials": {
+    "arcface": "arcface_m0p2_s30_seed4002",
+    "supcon": "supcon_t0p2_seed4002",
+    "triplet_margin": "triplet_margin0p4_seed4002"
+  },
+  "split_counts": {
+    "test": 9660,
+    "train": 45078,
+    "validation": 9660
+  },
+  "versions": {
+    "cuda": "12.8",
+    "h5py": "3.16.0",
+    "python": "3.10.12",
+    "pytorch": "2.8.0+cu128",
+    "pytorch_metric_learning": "2.8.1"
+  }
+}

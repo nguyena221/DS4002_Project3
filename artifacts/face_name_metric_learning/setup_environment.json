@@ -1,0 +1,45 @@
+{
+  "cuda": "12.8",
+  "cudnn": 91002,
+  "data": {
+    "class_count": 100,
+    "rows": 64398,
+    "split_counts": {
+      "test": 9660,
+      "train": 45078,
+      "validation": 9660
+    }
+  },
+  "device": "cuda:0",
+  "gpu": {
+    "available": true,
+    "count": 1,
+    "names": [
+      "NVIDIA L4"
+    ]
+  },
+  "packages": {
+    "pytorch": "2.8.0+cu128",
+    "pytorch_insightface": null,
+    "pytorch_metric_learning": "2.8.1",
+    "h5py": "3.16.0"
+  },
+  "paths": {
+    "faces_hdf5": "/nfs/home/aqu4eb/DS4002_Project3/data/processed/faces.h5",
+    "manifest": "/nfs/home/aqu4eb/DS4002_Project3/data/processed/manifest.csv"
+  },
+  "platform": "Linux-5.15.0-191-generic-x86_64-with-glibc2.35",
+  "pretrained_weights": {
+    "identifier": "local-converted:iresnet100",
+    "sha256": "8a51c4a5607d4d6db1e160562a01721b7b6516645d62325be47e36cf15eb9e59"
+  },
+  "python": "3.10.12",
+  "smoke_test": {
+    "embedding_dtype": "torch.float32",
+    "embedding_shape": [
+      512
+    ],
+    "h5_index": 10,
+    "normalized": true
+  }
+}
