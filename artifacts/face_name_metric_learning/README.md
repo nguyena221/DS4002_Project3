@@ -1,18 +1,40 @@
 # Face-name metric-learning handoff
 
-> Status: **generation pending**. This repository currently contains the
-> handoff contract and executable pipeline, but production candidate fitting,
-> embedding export, and the independent audit have not been executed. The files
-> listed below must be generated before upload; do not treat this README as an
-> acceptance result.
+This document is designed to help with final evaluation. The goal of this step is to take the input files listed below and produce one csv file containing the final accuracy, difference from the baseline and a statistical confidence interval inidcating if any of our selected fine-tuned models show improvements over the baseline un-fine-tuned IResNet-100. Files used include:
 
-The generated handoff is designed to contain embeddings only: no face images,
-checkpoints, or model weights are required by the evaluator.
+- `data/processed/manifest.csv`
+
+File listing the image names, h5 index (a unique number per image), first names, label (from 0-99 corresponding to each name), estimated age, det score, and sha hash for each of the ~64,000 images that survived pre-processing.
+
+- `embeddings/*.npz`
+
+These files contain all of the embeddings for each image in the validation and test data. Each file corresponds to one of the 4 models we trained (baseline un-fine-tuned iresnet100, fine-tuned triplet margin loss, fine-tuned arcface loss, and fine-tuned supcon loss). Validation over 10 total hyperparameters has already been done and the selected models were used to create the embeddings currently stored here.
+
+Here is the full shape of each `embeddings/*.npz` file:
+
+| Key | Type/shape | Meaning |
+|---|---|---|
+| `validation_h5_index` | `int64`, `(9660,)` | Original image IDs, in embedding-row order |
+| `validation_embeddings` | `float32`, `(9660, 512)` | Unit-normalized validation vectors |
+| `test_h5_index` | `int64`, `(9660,)` | Original image IDs, in embedding-row order |
+| `test_embeddings` | `float32`, `(9660, 512)` | Unit-normalized test vectors |
+
+- `trial_results.csv`
+
+This file contains the results of each fine-tuning run for all 10 models selected over during validation. For all 10 trails this includes a trial_id, the best validation loss, the hyperparameters used, and other less relevant information.
+
+- `handoff_manifest.json`
+
+This file contains lots of metadata about the data used/produced in training. Most importantly, under "models" the file includes all of the trial_id's (the same trial_id found in `trial_results.csv`) of the selected model (for each loss function).
+
+- `face_name_metrics/**`
+
+This is a python package that contains `bootstrap.py` and `metrics.py`, both utilities that will aid in performing the evaluation (your LLM will know how to use them).
 
 ## Upload
 
-After production generation and a successful independent audit, upload
-`data/processed/manifest.csv` and this directory's:
+Upload `data/processed/manifest.csv`, the entire `face_name_metrics/` package
+directory, and this directory's:
 
 - `trial_results.csv`
 - `handoff_manifest.json`
@@ -20,9 +42,20 @@ After production generation and a successful independent audit, upload
 - `embeddings/triplet_margin_selected.npz`
 - `embeddings/arcface_selected.npz`
 - `embeddings/supcon_selected.npz`
+- `README.md` (for reference)
 
-Keep the `README.md` beside them for reference. Do **not** upload candidate
-checkpoints or `data/processed/faces.h5`.
+In Colab, add the uploaded repository root to the import path:
+
+```python
+import sys
+from pathlib import Path
+
+root = Path(".")
+sys.path.insert(0, str(root))
+
+from face_name_metrics.bootstrap import paired_bootstrap_statistics
+from face_name_metrics.metrics import blocked_triplet_accuracy
+```
 
 ## Load and join
 
@@ -82,7 +115,8 @@ accuracy, reported in percentage points.
 
 ## Paired bootstrap and outputs
 
-Use root seed 4002 and derive one named child seed per split with concern
+Use the supplied `face_name_metrics.bootstrap` and `face_name_metrics.metrics`
+modules. Use root seed 4002 and derive one named child seed per split with concern
 `bootstrap` and scope `<split>` through the policy in the manifest to generate 2,000
 paired, name-stratified, image-level bootstrap replicates. Apply each sample's
 multiplicities to all four models. Exclude comparisons between

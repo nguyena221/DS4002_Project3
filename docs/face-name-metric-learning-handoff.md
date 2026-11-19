@@ -250,23 +250,6 @@ configuration cell, explicit paths, and fail-fast assertions.
 - Write `handoff_manifest.json` and the teammate-facing README.
 - Never change split membership or index ordering assumptions.
 
-### Local-only `notebooks/04_audit_handoff.ipynb`
-
-Run this before handoff, but do not commit it; `.gitignore` excludes it. It
-should independently:
-
-- Reload every NPZ.
-- Join every index to `manifest.csv`.
-- Verify shapes, dtypes, split coverage, uniqueness, finite values, and norms.
-- Recalculate checksums and compare them to the handoff manifest.
-- Verify the selected trial IDs and trial-table counts.
-- Recompute at least one known validation metric per model or a deterministic
-  check sample.
-- Write `audit` status and timestamp into `handoff_manifest.json`.
-
-Do not depend on LooseLeaf retaining variables for a week. Every stage must be
-rerunnable from persistent files and explicit inputs.
-
 ## Colab evaluation contract
 
 The evaluator should use:
