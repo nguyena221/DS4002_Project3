@@ -53,7 +53,10 @@ from pathlib import Path
 root = Path(".")
 sys.path.insert(0, str(root))
 
-from face_name_metrics.bootstrap import paired_bootstrap_statistics
+from face_name_metrics.bootstrap import (
+    paired_bootstrap_statistics,
+    stratified_bootstrap_multiplicities,
+)
 from face_name_metrics.metrics import blocked_triplet_accuracy
 ```
 
@@ -116,13 +119,84 @@ accuracy, reported in percentage points.
 ## Paired bootstrap and outputs
 
 Use the supplied `face_name_metrics.bootstrap` and `face_name_metrics.metrics`
-modules. Use root seed 4002 and derive one named child seed per split with concern
-`bootstrap` and scope `<split>` through the policy in the manifest to generate 2,000
-paired, name-stratified, image-level bootstrap replicates. Apply each sample's
-multiplicities to all four models. Exclude comparisons between
-duplicate draws of the same original `h5_index`, and use weighted precomputed
-similarity matrices rather than rebuilding triplets. Report a 95% interval for
-each fine-tuned model's lift; improvement is significant when it excludes zero.
+modules. Derive the child seed exactly as follows:
+
+```python
+import hashlib
+import json
+
+def bootstrap_seed(root_seed, split):
+    payload = json.dumps(
+        {
+            "root_seed": int(root_seed),
+            "concern": "bootstrap",
+            "scope": split,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return int.from_bytes(hashlib.sha256(payload).digest()[:4], "big")
+```
+
+For each split, load and align all four models by `h5_index`, then use one set of
+shared multiplicities for all paired baseline comparisons:
+
+```python
+root_seed = int(handoff["root_seed"])
+model_files = {
+    "baseline_iresnet100": "baseline_iresnet100.npz",
+    "triplet_margin_selected": "triplet_margin_selected.npz",
+    "arcface_selected": "arcface_selected.npz",
+    "supcon_selected": "supcon_selected.npz",
+}
+
+split = "validation"  # repeat for "test"
+target_rows = [row for row in identity.values() if row["split"] == split]
+target_h5_index = np.array([row["h5_index"] for row in target_rows], dtype=np.int64)
+first_names = np.array([row["first_name"] for row in target_rows], dtype=object)
+
+aligned = {}
+for model, filename in model_files.items():
+    with np.load(package / "embeddings" / filename, allow_pickle=False) as data:
+        source_index = data[f"{split}_h5_index"]
+        source_embeddings = data[f"{split}_embeddings"]
+    positions = {int(value): position for position, value in enumerate(source_index)}
+    aligned[model] = source_embeddings[
+        [positions[int(value)] for value in target_h5_index]
+    ]
+
+accuracies = {
+    model: blocked_triplet_accuracy(
+        embeddings, target_h5_index, first_names, block_size=1024
+    )
+    for model, embeddings in aligned.items()
+}
+
+draw_weights = stratified_bootstrap_multiplicities(
+    first_names,
+    replicates=2_000,
+    seed=bootstrap_seed(root_seed, split),
+)
+
+bootstrap = {}
+for model in model_files:
+    if model == "baseline_iresnet100":
+        continue
+    bootstrap[model] = paired_bootstrap_statistics(
+        aligned["baseline_iresnet100"],
+        aligned[model],
+        target_h5_index,
+        first_names,
+        replicates=2_000,
+        draw_weights=draw_weights,
+    )
+```
+
+`paired_bootstrap_statistics` excludes comparisons between duplicate draws of
+the same original `h5_index` and reuses the weighted similarity matrices. Its
+`similarity_lifts` and `confidence_interval` values are decimal fractions;
+multiply by 100 when reporting percentage points. Improvement is significant
+when the 95% interval excludes zero.
 
 Expected outputs are:
 
