@@ -2,12 +2,8 @@
 
 Contains all figures, tables, and artifacts produced for potential use in documents or presentations.
 
-## Preprocessing EDA
-Exploratory figures on raw data (`eda/`, made by `scripts/explore_data.py`).
+## Table of Contents
 
-| File | Contents |
-|---|---|
-| `eda/01_images_per_name.png` | Raw image count per first name (800 each) |
-| `eda/02_image_brightness.png` | Distribution of mean image brightness |
-| `eda/name_counts.csv`, `eda/summary.json` | Numbers behind the figures |
-| `eda/MI2_captions.md` | Figure captions |
+* [`artifacts`](./artifacts/README.md): Artifacts produced for final evaluation by [`training`](../scripts/training/README.md).
+* [`eda`](./eda/README.md): Figures and data collected during EDA on raw data.
+* *final_metrics.csv*: Contains the final accuracy scores on test and validation datasets for each candidate model, along with 95% confidence intervals on improvements over baseline.  

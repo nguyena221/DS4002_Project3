@@ -1,5 +1,7 @@
 # Data
 
+Contains raw and processed data used during implementation of analysis plan.
+
 | Path | Contents | In Git |
 |---|---|---|
 | `raw/Names100Dataset.tar.gz` | Original archive ([source](https://purl.stanford.edu/tp945cq9122)) | no |
@@ -7,7 +9,7 @@
 | `processed/faces.h5` | Final dataset, 64,398 aligned faces | no |
 | `processed/manifest.csv` | One row per image: HDF5 index, filename, name, label, split, estimated age, detection score, source hash | yes |
 
-## `faces.h5`
+## `processed/faces.h5` (not in git) (cleaned data produced by [`preprocess`](../scripts/preprocess/README.md))
 
 | Dataset | Shape / type |
 |---|---|
@@ -17,4 +19,3 @@
 | `split_indices/{train,validation,test}` | indices into `images` |
 | `filenames`, `class_names` | strings |
 
-Load with `scripts/prepared_dataset.py`. The data is for course use and subject to the dataset's terms.
