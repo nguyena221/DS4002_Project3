@@ -21,10 +21,10 @@ Thumbs.db
 *.h5.partial
 *.pth
 .insightface/
-!artifacts/face_name_metric_learning/embeddings/baseline_iresnet100.npz
-!artifacts/face_name_metric_learning/embeddings/triplet_margin_selected.npz
-!artifacts/face_name_metric_learning/embeddings/arcface_selected.npz
-!artifacts/face_name_metric_learning/embeddings/supcon_selected.npz
+!output/artifacts/embeddings/baseline_iresnet100.npz
+!output/artifacts/embeddings/triplet_margin_selected.npz
+!output/artifacts/embeddings/arcface_selected.npz
+!output/artifacts/embeddings/supcon_selected.npz
 notebooks/04_audit_handoff.ipynb
 
 data/raw/*
