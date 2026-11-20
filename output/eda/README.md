@@ -1,5 +1,5 @@
 ## Preprocessing EDA
-Exploratory figures on raw data (made by `scripts/explore_data.py` in [`preprocess`](../../scripts/preprocess/README.md)).
+Exploratory figures on raw data (made by `scripts/preprocess/explore_data.py` in [`preprocess`](../../scripts/preprocess/README.md)).
 
 | File | Contents |
 |---|---|

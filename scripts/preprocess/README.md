@@ -1,11 +1,11 @@
 # `preprocess`
 
-Contains all scripts used to prepreprocess, preprocess, postpreprocess, processs and postprocess the data. Run from the repository root with Python 3.11 and `requirements.txt`.
+Contains all scripts used to prepreprocess, preprocess, postpreprocess, processs, prepostprocess and postprocess the data.
 
 | Script | Purpose |
 |---|---|
 | `explore_data.py` | EDA on the raw archive; writes figures to `output/eda/` |
-| `preprocess.py` | Raw archive to `data/processed/faces.h5` and `manifest.csv` |
+| `preprocess.py` | Convert raw archive to `data/processed/faces.h5` and `manifest.csv` |
 | `prepared_dataset.py` | `PreparedFaces` loader for one split (PyTorch-compatible, no torch needed) |
 
 ## `preprocess.py` steps
